@@ -35,15 +35,15 @@
 
 3. 接下来就要对表格属性进行优化。打开表格属性窗口，设置参数如下：
 
-<img src="https://cdn.jsdelivr.net/gh/PaulRua/Images/202401171438045.png" alt="202401171438045" style="zoom: 50%;" />
+<img src="https://cdn.jsdelivr.net/gh/PaulRua/Images/202401171438045.png" alt="202401171438045" style="zoom: 33%;" />
 
 4. 如果你想要将某个表格和它上方的表格拉开一段距离，可以点击表格属性中的`定位`选项，设置`垂直定位`参数即可，比如`0.2厘米`。
 
-<img src="https://cdn.jsdelivr.net/gh/PaulRua/Images/202401171442973.png" alt="202401171442973" style="zoom: 50%;" />
+<img src="https://cdn.jsdelivr.net/gh/PaulRua/Images/202401171442973.png" alt="202401171442973" style="zoom: 33%;" />
 
 5. 单元格边距可以个性化调整，比如将每个单元格之间的默认间距设置为`0.04厘米`，这会使表格看起来更整洁（至少在我看来）。
 
-<img src="C:\Users\Paul\Downloads\202401171453955.png" alt="202401171453955" style="zoom:50%;" />
+<img src="C:\Users\Paul\Downloads\202401171453955.png" alt="202401171453955" style="zoom:33%;" />
 
 6. 每个单元格的行高可以根据实际需求调整。对于不同的行可以分别设置为`最小值`或`固定值`。
    - `最小值`行高是有**下限**的 :point_down:，行高会根据单元格中的内容进行自适应。
