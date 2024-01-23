@@ -3,8 +3,11 @@ import pandas as pd
 import radar
 
 
-def rename_files_with_excel(path):
+def rename_files_with_excel():
     grade, folder_path = radar.get_grade_and_folder_path()
+    path = os.path.join(folder_path, f'Y{grade}_report.xlsx')
+    if not os.path.exists(path):
+        print(f'找不到该文件路径: {path}')
     df = pd.read_excel(path)
 
     # 检查new_file_name列是否存在
@@ -21,7 +24,7 @@ def rename_files_with_excel(path):
             print(f"第{int(index) + 1}个学生的新文件名为空。")
             continue
 
-        new_file_path = os.path.join(folder_path, f'{new_file_name}.docx')
+        new_file_path = os.path.join(folder_path, f'Y{grade}报告单', f'{new_file_name}.docx')
 
         # 检查文件是否存在
         if not os.path.exists(old_file_path):
@@ -39,10 +42,7 @@ def rename_files_with_excel(path):
 
 
 def main():
-    excel_file_path = os.path.join(os.path.dirname(__file__), 'rename.xlsx')
-    if not os.path.exists(excel_file_path):
-        print(f'找不到该文件路径: {excel_file_path}')
-    rename_files_with_excel(excel_file_path)
+    rename_files_with_excel()
 
 
 if __name__ == '__main__':

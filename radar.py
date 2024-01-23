@@ -15,6 +15,7 @@ def get_radar_dict():
             'english_columns': ['Speaking', 'Reading', 'Writing', 'Use of English', 'Listening'],
             'physical_columns_1': ['BMI', '肺活量', '50米跑', '坐位体前屈', '1分钟跳绳'],
             'physical_columns_2': ['BMI', '肺活量', '50米跑', '坐位体前屈', '1分钟跳绳', '仰卧卷腹'],
+            'physical_columns_3': ['BMI', '肺活量', '50米跑', '坐位体前屈', '1分钟跳绳', '仰卧卷腹', '50*8往返跑'],
             }
 
 
@@ -146,7 +147,7 @@ def main():
     radar_dict = get_radar_dict()
     grade, folder_path = get_grade_and_folder_path()
     # 读取xlsx文件
-    xlsx_file = os.path.join(folder_path, 'report.xlsx')
+    xlsx_file = os.path.join(folder_path, f'Y{grade}_report.xlsx')
     df = pd.read_excel(xlsx_file)
 
     # 创建文件夹以保存雷达图
