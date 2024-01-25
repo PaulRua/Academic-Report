@@ -33,7 +33,13 @@ def convert_to_pdf(grade, folder_path):
 
 
 def main():
-    grade, folder_path = radar.get_grade_and_folder_path()
+    result = radar.get_grade_and_folder_path()
+
+    if result is None:
+        print("用户选择退出程序。")
+        return  # 直接退出 main 函数
+
+    grade, folder_path = result
     convert_to_pdf(grade, folder_path)
 
 

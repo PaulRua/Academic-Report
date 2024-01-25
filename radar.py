@@ -38,6 +38,17 @@ def select_columns_for_subject(sub, grade, radar_dict):
             return radar_dict['physical_columns_3']
 
 
+def check_columns_exist(df, select_columns, sub):
+    """
+    检查DataFrame中是否存在指定的列。
+    """
+    missing_columns = [col for col in select_columns if col not in df.columns]
+    if missing_columns:
+        print(f"Excel中没有以下{sub}标题：\n{', '.join(missing_columns)}")
+        return False
+    return True
+
+
 def create_radar_chart(sub, row, select_columns, output_folder):
     """
     为每个学生生成雷达图。
@@ -131,7 +142,11 @@ def create_radar_chart(sub, row, select_columns, output_folder):
 
 def get_grade_and_folder_path():
     while True:
-        grade = input('请输入要操作的年级数字（如1、2、3）：')
+        grade = input('请输入要操作的年级数字（如1、2、3）或者输入 e 退出程序：')
+
+        if grade == 'e':
+            return None
+
         if grade.isdigit() and 1 <= int(grade) <= 6:
             folder_path = os.path.join(os.path.dirname(__file__), f'Y{grade}_RADAR')
             if not os.path.exists(folder_path):
@@ -145,18 +160,29 @@ def get_grade_and_folder_path():
 
 def main():
     radar_dict = get_radar_dict()
-    grade, folder_path = get_grade_and_folder_path()
-    # 读取xlsx文件
+    result = get_grade_and_folder_path()
+
+    if result is None:
+        print("用户选择退出程序。")
+        return  # 直接退出 main 函数
+
+    grade, folder_path = result
     xlsx_file = os.path.join(folder_path, f'Y{grade}_report.xlsx')
+
+    if not os.path.exists(xlsx_file):
+        print(f"找不到文件: {xlsx_file}")
+        return
+
     df = pd.read_excel(xlsx_file)
 
     # 创建文件夹以保存雷达图
     for sub in radar_dict['subjects']:
         output_folder = os.path.join(folder_path, sub)
         os.makedirs(output_folder, exist_ok=True)
-
+        select_columns = select_columns_for_subject(sub, grade, radar_dict)
+        if not check_columns_exist(df, select_columns, sub):
+            continue  # 如果列不存在，则跳过当前学科
         for _, row in df.iterrows():
-            select_columns = select_columns_for_subject(sub, grade, radar_dict)
             create_radar_chart(sub, row, select_columns, output_folder)
 
 
