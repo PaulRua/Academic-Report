@@ -2,6 +2,25 @@ import pandas as pd
 import plotly.graph_objs as go
 import plotly.io as pio
 import os
+import time as t
+
+
+def get_grade_and_folder_path():
+    while True:
+        grade = input('请输入要操作的年级数字（如1、2、3）或者输入 e 退出程序：')
+
+        if grade == 'e':
+            return None
+
+        if grade.isdigit() and 1 <= int(grade) <= 6:
+            folder_path = os.path.join(os.path.dirname(__file__), f'Y{grade}_RADAR')
+            if not os.path.exists(folder_path):
+                print(f'找不到文件目录: {folder_path}')
+                continue
+            break
+        else:
+            print("输入的数字不符合要求，请输入小于或等于6的数字。")
+    return grade, folder_path
 
 
 def get_radar_dict():
@@ -17,6 +36,45 @@ def get_radar_dict():
             'physical_columns_2': ['BMI', '肺活量', '50米跑', '坐位体前屈', '1分钟跳绳', '仰卧卷腹'],
             'physical_columns_3': ['BMI', '肺活量', '50米跑', '坐位体前屈', '1分钟跳绳', '仰卧卷腹', '50*8往返跑'],
             }
+
+
+def get_subject_choice(radar_dict):
+    """
+    显示所有学科供用户选择。
+    """
+    subjects = radar_dict['subjects']
+    while True:
+        print("\n选择学科：")
+        for i, sub in enumerate(subjects, 1):
+            print(f"{i}. {sub}")
+        print("a. 全部学科")
+        choice = input("输入学科序号或输入字母'a'选择全部学科：").strip().lower()
+
+        if choice == 'a':
+            return subjects  # 返回所有学科
+        elif choice.isdigit() and 1 <= int(choice) <= len(subjects):
+            return [subjects[int(choice) - 1]]  # 返回指定学科
+        else:
+            print("输入无效，请重新输入。")
+        t.sleep(.5)
+
+
+def get_student_choice(df):
+    """
+    提示用户输入学生姓名或选择生成全部学生的雷达图。
+    """
+    while True:
+        print("\n选择学生：")
+        print("a. 全部学生")
+        choice = input("输入学生姓名或输入字母'a'生成全部学生的雷达图：").strip().lower()
+
+        if choice == 'a':
+            return df  # 返回全部学生的DataFrame
+        elif choice in df['学生姓名'].values:
+            return df[df['学生姓名'] == choice]  # 返回指定学生的DataFrame
+        else:
+            print(f"没有找到'{choice}'同学，请重新输入。")
+        t.sleep(.5)
 
 
 def select_columns_for_subject(sub, grade, radar_dict):
@@ -140,24 +198,6 @@ def create_radar_chart(sub, row, select_columns, output_folder):
     print(f"Saved {sub} {output_file}!")
 
 
-def get_grade_and_folder_path():
-    while True:
-        grade = input('请输入要操作的年级数字（如1、2、3）或者输入 e 退出程序：')
-
-        if grade == 'e':
-            return None
-
-        if grade.isdigit() and 1 <= int(grade) <= 6:
-            folder_path = os.path.join(os.path.dirname(__file__), f'Y{grade}_RADAR')
-            if not os.path.exists(folder_path):
-                print(f'找不到文件目录: {folder_path}')
-                continue
-            break
-        else:
-            print("输入的数字不符合要求，请输入小于或等于6的数字。")
-    return grade, folder_path
-
-
 def main():
     radar_dict = get_radar_dict()
     result = get_grade_and_folder_path()
@@ -174,15 +214,19 @@ def main():
         return
 
     df = pd.read_excel(xlsx_file)
+    selected_subjects = get_subject_choice(radar_dict)
+    selected_students = get_student_choice(df)
 
     # 创建文件夹以保存雷达图
-    for sub in radar_dict['subjects']:
+    for sub in selected_subjects:
         output_folder = os.path.join(folder_path, sub)
         os.makedirs(output_folder, exist_ok=True)
         select_columns = select_columns_for_subject(sub, grade, radar_dict)
+
         if not check_columns_exist(df, select_columns, sub):
             continue  # 如果列不存在，则跳过当前学科
-        for _, row in df.iterrows():
+
+        for _, row in selected_students.iterrows():
             create_radar_chart(sub, row, select_columns, output_folder)
 
 

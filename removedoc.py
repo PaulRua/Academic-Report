@@ -6,24 +6,24 @@ import shutil
 
 
 def format_column_list(columns):
-    formatted_list = "\n".join([f"{idx + 1}. {col}" for idx, col in enumerate(columns)])
+    formatted_list = "\n".join([f"{idx}. {col}" for idx, col in enumerate(columns, 1)])
     return formatted_list
 
 
 def get_user_input_column(df, column_purpose):
     while True:
         formatted_columns = format_column_list(df.columns[:4])
-        print(f"可用的列名:\n{formatted_columns}")
+        print(f"\n可用的列名如下:\n{formatted_columns}")
         print("输入 'e' 退出程序。")
-        user_input = input(f"请选择用于{column_purpose}的列名的编号: ").strip().lower()
+        user_input = input(f"\n请选择用于{column_purpose}的列名的编号: ").strip().lower()
 
         if user_input == 'e':
             return None
 
         try:
-            column_number = int(user_input) - 1
-            if 0 <= column_number < len(df.columns[:4]):
-                return df.columns[column_number]
+            column_number = int(user_input)
+            if 1 <= column_number < len(df.columns[:4]):
+                return df.columns[column_number - 1]
             else:
                 print("输入的编号不正确，请重新输入！")
         except ValueError:
@@ -68,7 +68,7 @@ def move_files_to_folders(df, folder_path, grade, class_column):
             shutil.move(src_path, os.path.join(dest_folder, doc_name))
             print(f"{doc_name}已移动至{class_name}文件夹内。")
         else:
-            print(f"找不到文件: {src_path}")
+            print(f"找不到文件: {doc_name} ------ 请检查路径：{src_path}")
 
 
 def main():
