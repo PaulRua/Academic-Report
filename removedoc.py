@@ -52,6 +52,7 @@ def move_files_to_folders(df, folder_path, grade, class_column):
     for index, row in df.iterrows():
         class_name = row[class_column]
         doc_name = row['new_file_name'] + '.pdf'
+        # doc_name = row['new_file_name'] + '.docx'
         src_path = os.path.join(folder_path, f'Y{grade}报告单', doc_name)
         dest_folder = os.path.join(folder_path, f'Y{grade}报告单', class_name)
         if not os.path.exists(dest_folder):

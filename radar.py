@@ -27,16 +27,20 @@ def get_radar_dict():
     """
     返回包含雷达图配置的字典。
     """
-    return {'subjects': ['chinese', 'math', 'english', 'physical'],
-            'chinese_columns_1': ['识字写字', '阅读理解', '表达交流', '写话', '综合实践'],
-            'chinese_columns_2': ['识字写字', '阅读理解', '写话', '表达交流', '综合实践'],
-            # 'chinese_columns_2': ['Literacy', 'Comprehension', 'Vocabulary', 'Communication', 'Activities'],
-            'math_columns': ['计算能力', '审题能力', '解决问题', '实践操作', '双语能力'],
-            # 'math_columns': ['Calculation', 'Analysis', 'Problem-Solving', 'Practice', 'Bilingualism'],
+    return {'subjects': ['chinese', 'math', 'english', 'physical', 'science'],
+            'chinese_columns_1': ['汉语拼音', '识字写字', '阅读理解', '表达交流', '综合实践'],   # Y1
+            'chinese_columns_2': ['识字写字', '阅读理解', '写话', '表达交流', '综合实践'],  # Y2
+            'chinese_columns_3': ['识字写字', '阅读理解', '习作', '表达交流', '综合实践'],   # Y3
+            'chinese_columns_4': ['识字写字', '阅读理解', '积累运用', '表达交流', '综合实践'],  # Y4 - Y6
+            # 'chinese_columns_4': ['Literacy', 'Comprehension', 'Application', 'Communication', 'Activities'],
+            'math_columns_1': ['计算能力', '审题能力', '解决问题', '实践操作', '双语能力'],
+            'math_columns_2': ['审题能力', '计算能力', '知识应用', '问题解决', '双语能力'],
+            # 'math_columns_2': ['Comprehension', 'Calculation', 'Application', 'Problem-Solving', 'Bilingualism'],
             'english_columns': ['Speaking', 'Reading', 'Writing', 'Use of English', 'Listening'],
             'physical_columns_1': ['BMI', '肺活量', '50米跑', '坐位体前屈', '1分钟跳绳'],
             'physical_columns_2': ['BMI', '肺活量', '50米跑', '坐位体前屈', '1分钟跳绳', '仰卧卷腹'],
             'physical_columns_3': ['BMI', '肺活量', '50米跑', '坐位体前屈', '1分钟跳绳', '仰卧卷腹', '50*8往返跑'],
+            'science_columns_1': ['观察实验能力', '科学思维能力', '动手实践能力', '科学表达能力', '词汇应用能力'],
             }
 
 
@@ -68,7 +72,7 @@ def get_student_choice(df):
     while True:
         print("\n选择学生：")
         print("a. 全部学生")
-        choice = input("输入学生姓名或输入字母'a'生成全部学生的雷达图：").strip().lower()
+        choice = input("输入学生姓名或输入字母'a'生成全部学生的雷达图：")
 
         if choice == 'a':
             return df  # 返回全部学生的DataFrame
@@ -84,9 +88,19 @@ def select_columns_for_subject(sub, grade, radar_dict):
     根据学科和年级选择适当地评价维度。
     """
     if sub == 'chinese':
-        return radar_dict['chinese_columns_1'] if grade == '1' else radar_dict['chinese_columns_2']
+        if grade in ['1']:
+            return radar_dict['chinese_columns_1']
+        elif grade in ['2']:
+            return radar_dict['chinese_columns_2']
+        elif grade in ['3']:
+            return radar_dict['chinese_columns_3']
+        else:
+            return radar_dict['chinese_columns_4']
     elif sub == 'math':
-        return radar_dict['math_columns']
+        if grade in ['1', '2', '3']:
+            return radar_dict['math_columns_1']
+        else:
+            return radar_dict['math_columns_2']
     elif sub == 'english':
         return radar_dict['english_columns']
     elif sub == 'physical':
@@ -96,6 +110,9 @@ def select_columns_for_subject(sub, grade, radar_dict):
             return radar_dict['physical_columns_2']
         else:
             return radar_dict['physical_columns_3']
+    elif sub == 'science':
+        if grade in ['1']:
+            return radar_dict['science_columns_1']
 
 
 def check_columns_exist(df, select_columns, sub):
@@ -104,7 +121,7 @@ def check_columns_exist(df, select_columns, sub):
     """
     missing_columns = [col for col in select_columns if col not in df.columns]
     if missing_columns:
-        print(f"Excel中没有以下{sub}标题：\n{', '.join(missing_columns)}")
+        print(f"Excel中没有{sub}标题：\n{', '.join(missing_columns)}")
         return False
     return True
 
@@ -148,7 +165,7 @@ def create_radar_chart(sub, row, select_columns, output_folder):
     vertical_offset = 8  # 自定义垂直偏移量，根据需要调整
     for i, val in enumerate(values):
         # 当学科为physical时，跳过不显示分数
-        if sub != 'physical':
+        if sub != 'physical' or 'science':
             r = [val - vertical_offset]
             fig.add_trace(go.Scatterpolar(
                 r=r,
@@ -156,13 +173,13 @@ def create_radar_chart(sub, row, select_columns, output_folder):
                 mode='text',
                 text=str(round(val * 0.05, 1)),  # 保留整数部分
                 textposition='bottom center',
-                textfont=dict(family='Microsoft YaHei', size=24, color='#FF5722'),
+                textfont=dict(family='PingFang SC', size=24, color='#FF5722'),
                 name='',
             ))
 
     fig.update_polars(
         gridshape='circular',  #
-        bgcolor='#ffffff',
+        bgcolor='rgba(0,0,0,0)',  # 设置为透明背景
         radialaxis=dict(visible=True,
                         showgrid=True,
                         showticklabels=False,
@@ -179,18 +196,15 @@ def create_radar_chart(sub, row, select_columns, output_folder):
                          gridwidth=2,
                          gridcolor='rgba(128, 128, 128, 0.4)',
                          direction="clockwise",  # 设置方向为顺时针，使底边水平
-                         tickfont=dict(family='Microsoft YaHei', size=50, color='black'),
+                         tickfont=dict(family='PingFang SC', size=50, color='#393939'),
                          ),
     )
 
     fig.update_layout(
         showlegend=False,  # 不显示图例
-        # title=f'{sub}',
-        # title_x=0.05,
-        # title_y=0.95,
-        # title_font=dict(family='Arial Bold', size=60, color='black'),
+        paper_bgcolor='rgba(0,0,0,0)',  # 整个图表的纸张背景设置为透明
         height=900,
-        width=1200,
+        width=1300,
     )
 
     # 保存雷达图为.png文件
@@ -210,7 +224,7 @@ def main():
 
     grade, folder_path = result
     xlsx_file = os.path.join(folder_path, f'Y{grade}_report.xlsx')
-
+    # xlsx_file = os.path.join(folder_path, f'Y{grade}_report_english.xlsx')
     if not os.path.exists(xlsx_file):
         print(f"找不到文件: {xlsx_file}")
         return

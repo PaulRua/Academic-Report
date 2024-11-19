@@ -16,7 +16,7 @@ def rename_files_with_excel():
         return
 
     for index, row in df.iterrows():
-        old_file_path = os.path.join(folder_path, f'Y{grade}报告单', f'Y{grade}报告单_{int(index) + 1}.docx')
+        old_file_path = os.path.join(folder_path, f'Y{grade}报告单', f'Y{grade}_{int(index) + 1}.docx')
         new_file_name = row['new_file_name']
 
         # 检查新文件名是否为空
